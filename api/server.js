@@ -41,11 +41,17 @@ app.get('/users/:id', (req, res) => {
   const tarId = req.params.id;
   dbFunctions
     .findById(tarId)
-    .then((user) => res.status(200).json(user))
+    .then((user) => {
+      user
+        ? res.status(200).json(user)
+        : res
+            .status(404)
+            .json({ message: `The user with the specified ID does not exist` });
+    })
     .catch(() =>
       res
-        .status(404)
-        .json({ message: `The user with the specified ID does not exist` }),
+        .status(500)
+        .json({ message: 'The users information could not be retrieved' }),
     );
 });
 
@@ -77,11 +83,9 @@ app.put('/users/:id', (req, res) => {
     } else {
       dbFunctions.update(tarId, { name, bio }).then((user) => {
         user === null
-          ? res
-              .status(404)
-              .json({
-                message: 'The user with the specified ID does not exist',
-              })
+          ? res.status(404).json({
+              message: 'The user with the specified ID does not exist',
+            })
           : res.status(200).json(user);
       });
     }

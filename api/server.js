@@ -65,6 +65,33 @@ app.delete('/users/:id', (req, res) => {
   }
 });
 
+app.put('/users/:id', (req, res) => {
+  const tarId = req.params.id;
+  const { name, bio } = req.body;
+
+  try {
+    if (!name || !bio) {
+      res
+        .status(400)
+        .json({ message: 'Please provide name and bio for the user' });
+    } else {
+      dbFunctions.update(tarId, { name, bio }).then((user) => {
+        user === null
+          ? res
+              .status(404)
+              .json({
+                message: 'The user with the specified ID does not exist',
+              })
+          : res.status(200).json(user);
+      });
+    }
+  } catch (e) {
+    res
+      .status(500)
+      .json({ message: 'The user information could not be modified' });
+  }
+});
+
 app.use('*', (req, res) => {
   res.status(404).json({ message: '404 Not Found*:' });
 });
